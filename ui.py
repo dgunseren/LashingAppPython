@@ -9,6 +9,7 @@ import lashing as ls
 import load as ld
 import forces as ff
 import calcs
+import latex_report
 
 class LashingInput(QFrame):
     def __init__(self, parent=None):
@@ -228,8 +229,29 @@ class MainWindow(QMainWindow):
         layout.addWidget(group)
     
     def add_lashing_input(self):
+        # Create new lashing input widget
         lashing_input = LashingInput()
+        
+        # If this is not the first lashing, copy values from the first one
+        if self.lashing_layout.count() > 0:
+            first_lashing = self.lashing_layout.itemAt(0).widget()
+            lashing_input.alpha.setText(first_lashing.alpha.text())
+            lashing_input.beta.setText(first_lashing.beta.text())
+            lashing_input.breaking_strength.setText(first_lashing.breaking_strength.text())
+            lashing_input.side.setCurrentText(first_lashing.side.currentText())
+        
+        # Add to layout
         self.lashing_layout.addWidget(lashing_input)
+        
+        # Add remove button if this is not the first lashing
+        if self.lashing_layout.count() > 1:
+            remove_btn = QPushButton("Remove")
+            remove_btn.clicked.connect(lambda: self.remove_lashing_input(lashing_input, remove_btn))
+            self.lashing_layout.addWidget(remove_btn)
+    
+    def remove_lashing_input(self, lashing_input, remove_btn):
+        lashing_input.deleteLater()
+        remove_btn.deleteLater()
     
     def add_input_field(self, layout, label_text, field_name, is_combo=False):
         container = QWidget()
@@ -278,6 +300,7 @@ class MainWindow(QMainWindow):
             
             # Get lashing parameters and create Lashing objects
             lashings = []
+            lashings_data = []  # Store raw lashing data for LaTeX report
             for i in range(self.lashing_layout.count()):
                 widget = self.lashing_layout.itemAt(i).widget()
                 if isinstance(widget, LashingInput):
@@ -286,6 +309,14 @@ class MainWindow(QMainWindow):
                         beta = float(widget.beta.text())
                         breaking_strength = float(widget.breaking_strength.text())
                         side = widget.side.currentText()[0]  # Get first letter (F, R, L, A)
+                        
+                        # Store raw lashing data
+                        lashings_data.append({
+                            'alpha': alpha,
+                            'beta': beta,
+                            'breaking_strength': breaking_strength,
+                            'side': side
+                        })
                         
                         # Create Lashing object
                         lashing = ls.Lashing(
@@ -320,6 +351,15 @@ class MainWindow(QMainWindow):
                 calcs.longtidunalSliding(load, lashings, forces)
             longitudinal_result = f.getvalue().split('\n')
             
+            # Generate LaTeX report with raw input values
+            latex_report.generate_latex_report(
+                dimx, dimy, dimz, mass,
+                slope, wind_force, friction_coeff,
+                lashings_data,
+                transverse_result,
+                longitudinal_result
+            )
+            
             # Format the result
             result = (
                 f"Calculation Results:\n\n"
@@ -337,6 +377,7 @@ class MainWindow(QMainWindow):
                 if line.strip():
                     result += f"  {line}\n"
             
+            result += "\nLaTeX report has been generated as 'lashing_report.tex'"
             self.result_label.setText(result)
             
         except ValueError as e:
