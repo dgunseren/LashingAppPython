@@ -3,9 +3,9 @@ import numpy as np
 class Forces:
     g = 9.81
     forceDict={
-            'breakAccel':0.8*g/10,
-            'Accel':0.5*g/10,
-            'Cornering':0.5*g/10,
+            'breakAccel':0.8*g,
+            'Accel':0.5*g,
+            'Cornering':0.5*g,
             }
     valueOftheForces = {
         'forward':0,

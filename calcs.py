@@ -13,6 +13,7 @@ def transverseSliding(load,lashings,forces):
         totalLashingX = totalLashingX+ abs(_.fx)
     finalforceX = totalLashingX+friction*np.cos(np.deg2rad(forces.slope))
 
+
     if xForces<finalforceX:
         print('No transverse sliding occurs.')
     else:
