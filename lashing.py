@@ -9,6 +9,11 @@ class Lashing:
         self.RelativeSide = RelativeSide
         self.groundPosition = groundPosition
         self.LoadPosition = LoadPosition
+        self.ConversionFx = 0
+        self.ConversionFy = 0
+        self.ConversionFz = 0
+        self.leaningtoward = 'R'
+        self.LashingForceForMoments=[0,0,0]
         self.forces()
         self.effectiveCoeff()
         

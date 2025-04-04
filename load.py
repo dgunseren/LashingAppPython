@@ -9,3 +9,6 @@ class Load:
         self.XZCrossSection = self.dimx*self.dimz
         self.YZCrossSection = self.dimy*self.dimz
 
+        self.cgx = self.dimx/2
+        self.cgy = self.dimy/2
+        self.cgz = self.dimz/2
